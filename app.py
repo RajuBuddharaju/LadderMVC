@@ -54,6 +54,27 @@ def index():
         users = UE.query.order_by(UE.date_created)
         return render_template("index.html", title=title, users=users)
 
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+   title = "Login"
+   if request.method == "POST":
+      user_id = request.form['id']
+      user_password = request.form['password']
+      user = ME.query.filter_by(id=user_id).first()
+      if user is None:
+         return redirect('/login')
+      elif user.password == user_password:
+         return redirect('/dashboard')
+      else:
+         return redirect('/login')
+   else:
+      return render_template("login.html", title=title)
+   
+@app.route('/dashboard')
+def dashboard():
+   title = "Dashboard"
+   return render_template("dashboard.html", title=title)
+
 @app.route('/about')
 def about():
    title = "About The Ladder"
