@@ -9,19 +9,31 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///employeeAndUser.db'
 db = SQLAlchemy(app)
 
 # Create db model
+class ME(db.Model):
+   id = db.Column(db.Integer, primary_key=True)
+   password = db.Column(db.String(200))
+   activeUEID = db.Column(db.Integer)
+   
+   # Creae a fucntion to return a string when we add something
+   def __repr__(self):
+      return '<Name %r>' % self.id
+
+# Create db model
 class UE(db.Model):
    id = db.Column(db.Integer, primary_key=True)
-   name = db.Column(db.String(200))
-   meID = db.Column(db.Integer)
+   meID = db.Column(db.Integer, foreign_key=True)
    dataValue1 = db.Column(db.String(64))
    dataValue2 = db.Column(db.String(64))
    dataValue3 = db.Column(db.String(64))
    dataValue4 = db.Column(db.String(64))
    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+   name = db.Column(db.String(200))
    
    # Creae a fucntion to return a string when we add something
    def __repr__(self):
       return '<Name %r>' % self.id
+
+
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
