@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Welcome to your Dashboard, MEID: {{ me.id }}</h1>
+<form method="post" action="{{ url_for('update_ueids') }}">
+    <table>
+        <tr>
+            <th>UEID</th>
+            <th>Data Value 1</th>
+            <th>Data Value 2</th>
+            <th>Data Value 3</th>
+            <th>Data Value 4</th>
+            <th>Actions</th>
+        </tr>
+        {% for ue in ue_list %}
+        <tr>
+            <td>{{ ue.id }}</td>
+            <td><input type="text" name="dataValue1_{{ ue.id }}" value="{{ ue.dataValue1 }}"></td>
+            <td><input type="text" name="dataValue2_{{ ue.id }}" value="{{ ue.dataValue2 }}"></td>
+            <td><input type="text" name="dataValue3_{{ ue.id }}" value="{{ ue.dataValue3 }}"></td>
+            <td><input type="text" name="dataValue4_{{ ue.id }}" value="{{ ue.dataValue4 }}"></td>
+            <td><input type="submit" value="Update"></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <input type="hidden" name="meid" value="{{ me.id }}">
+    <input type="submit" value="Apply Changes">
+</form>
+<!-- Add additional scripts if needed -->
+{% endblock %}
