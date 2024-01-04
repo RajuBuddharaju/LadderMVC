@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create MEID</title>
+    <!-- Add link to CSS files if needed -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: auto;
+            width: 50%;
+        }
+        input[type="text"], input[type="password"] {
+            margin: 10px 0;
+            padding: 10px;
+            width: 80%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Create New MEID</h1>
+    <form action="{{ url_for('create_meid') }}" method="post">
+        <input type="text" name="meid_name" placeholder="MEID Name" required><br>
+        <input type="password" name="meid_password" placeholder="Password" required><br>
+        <!-- Add additional fields as necessary -->
+        <input type="submit" value="Create MEID">
+    </form>
+</body>
+</html>

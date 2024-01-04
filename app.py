@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import sqlite3
 import random
 
 app = Flask(__name__)
+app.secret_key = b'\x12\xfbF\xf3\xc5\xa6\x9e\xc6\xa8\x11\xdf\x9e\x95\xf1\xa1\x8f\xe6K\x89u7\x18\x19\x8f'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dbExample.db'
 # Initialize the database
 db = SQLAlchemy(app)
@@ -97,16 +98,38 @@ def dashboard():
 def update_ueids():
     me_id = request.form.get('meid')
     if not me_id:
-        flash('No MEID provided.', 'error')
         return redirect(url_for('login'))
+
+    # Retrieve the ME object for the given MEID
+    me = MEID.query.get(me_id)
+    if not me:
+        return redirect(url_for('login'))
+
+    # Check if we're setting a new active UEID
+    new_active_ueid = request.form.get('activeUEID')
+    if new_active_ueid:
+        me.activeUEID = new_active_ueid
+        db.session.commit()
 
     # Retrieve all UEIDs for the given MEID
     ue_list = UEID.query.filter_by(meID=me_id).all()
     ue_ids = [ue.id for ue in ue_list]
 
     try:
+        # Update data values for UEIDs
         for ue_id in ue_ids:
-            # Get the new data values from the form
+            # If deleting a UEID
+            if request.form.get('delete_ueid') == str(ue_id):
+                ue = UEID.query.get(ue_id)
+                if ue:
+                    # Check if the UEID to delete is the active UEID for the ME
+                    if me.activeUEID == ue_id:
+                        me.activeUEID = None  # Reset the activeUEID
+
+                    db.session.delete(ue)
+                    continue  # Skip the rest of the loop for this UEID
+
+            # Otherwise, update the UEID
             data_value_1 = request.form.get(f'dataValue1_{ue_id}')
             data_value_2 = request.form.get(f'dataValue2_{ue_id}')
             data_value_3 = request.form.get(f'dataValue3_{ue_id}')
@@ -120,12 +143,88 @@ def update_ueids():
                 ue.dataValue2 = data_value_2
                 ue.dataValue3 = data_value_3
                 ue.dataValue4 = data_value_4
-                db.session.commit()
+
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        # Optionally, add a message to inform the user of the error
+        # flash(f'An error occurred: {e}', 'error')
+
+    # Redirect back to the dashboard after processing updates
+    return redirect(url_for('dashboard', me_id=me_id))
+
+
+@app.route('/create_ueid', methods=['POST'])
+def create_ueid():
+    me_id = request.form.get('meid')
+    if not me_id:
+        flash('No MEID provided.', 'error')
+        return redirect(url_for('login'))
+
+    # Retrieve the ME object for the given MEID
+    me = MEID.query.get(me_id)
+    if not me:
+        flash('MEID not found.', 'error')
+        return redirect(url_for('login'))
+
+    # Get the data values from the form
+    name = request.form.get('name')
+    data_value_1 = request.form.get('dataValue1')
+    data_value_2 = request.form.get('dataValue2')
+    data_value_3 = request.form.get('dataValue3')
+    data_value_4 = request.form.get('dataValue4')
+
+    # Create a new UE object and set its attributes
+    new_ue = UEID(meID=me_id, name=name, dataValue1=data_value_1, dataValue2=data_value_2, dataValue3=data_value_3, dataValue4=data_value_4)
+
+    try:
+        # Add the new UE object to the session and commit it to the database
+        db.session.add(new_ue)
+        db.session.commit()
     except Exception as e:
         db.session.rollback()
 
+    # Redirect back to the dashboard after processing
     return redirect(url_for('dashboard', me_id=me_id))
- 
+
+@app.route('/secret', methods=['GET', 'POST'])
+def secret():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        if username == "bobobobobo" and password == "bananamonkeytime":
+            return render_template('meid_creation.html')
+        else:
+            return redirect(url_for('login'))
+
+    return render_template('secret_login.html')
+
+@app.route('/create_meid', methods=['POST'])
+def create_meid():
+    meid_input = request.form.get('meid_name')
+    meid_password = request.form.get('meid_password')
+
+    try:
+        # Convert MEID input to an integer
+        meid_number = int(meid_input)
+    except ValueError:
+        # Handle the case where conversion fails
+        flash('MEID must be a number.', 'error')
+        return redirect(url_for('secret'))
+
+    # Proceed with creating the MEID
+    new_meid = MEID(id=meid_number, password=meid_password)
+
+    try:
+        db.session.add(new_meid)
+        db.session.commit()
+        flash('New MEID created successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'An error occurred: {e}', 'error')
+
+    return redirect(url_for('dashboard'))
  
 @app.route('/about')
 def about():

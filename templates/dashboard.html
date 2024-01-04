@@ -1,30 +1,78 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Welcome to your Dashboard, MEID: {{ me.id }}</h1>
-<form method="post" action="{{ url_for('update_ueids') }}">
-    <table>
-        <tr>
-            <th>UEID</th>
-            <th>Data Value 1</th>
-            <th>Data Value 2</th>
-            <th>Data Value 3</th>
-            <th>Data Value 4</th>
-            <th>Actions</th>
-        </tr>
-        {% for ue in ue_list %}
-        <tr>
-            <td>{{ ue.id }}</td>
-            <td><input type="text" name="dataValue1_{{ ue.id }}" value="{{ ue.dataValue1 }}"></td>
-            <td><input type="text" name="dataValue2_{{ ue.id }}" value="{{ ue.dataValue2 }}"></td>
-            <td><input type="text" name="dataValue3_{{ ue.id }}" value="{{ ue.dataValue3 }}"></td>
-            <td><input type="text" name="dataValue4_{{ ue.id }}" value="{{ ue.dataValue4 }}"></td>
-            <td><input type="submit" value="Update"></td>
-        </tr>
-        {% endfor %}
-    </table>
-    <input type="hidden" name="meid" value="{{ me.id }}">
-    <input type="submit" value="Apply Changes">
-</form>
-<!-- Add additional scripts if needed -->
+<div class="container">
+    <h1 class="my-4">Welcome to your Dashboard, MEID: {{ me.id }}</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">UEID List</div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('update_ueids') }}">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Select Active</th>
+                            <th>UEID</th>
+                            <th>Name</th>
+                            <th>Data Value 1</th>
+                            <th>Data Value 2</th>
+                            <th>Data Value 3</th>
+                            <th>Data Value 4</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ue in ue_list %}
+                        <tr class="{{ 'table-success' if ue.id == me.activeUEID else '' }}">
+                            <td><input type="radio" class="form-check-input" name="activeUEID" value="{{ ue.id }}" {% if ue.id == me.activeUEID %} checked {% endif %}></td>
+                            <td>{{ ue.id }}</td>
+                            <td>{{ ue.name }}</td>
+                            <td><input type="text" class="form-control" name="dataValue1_{{ ue.id }}" value="{{ ue.dataValue1 }}"></td>
+                            <td><input type="text" class="form-control" name="dataValue2_{{ ue.id }}" value="{{ ue.dataValue2 }}"></td>
+                            <td><input type="text" class="form-control" name="dataValue3_{{ ue.id }}" value="{{ ue.dataValue3 }}"></td>
+                            <td><input type="text" class="form-control" name="dataValue4_{{ ue.id }}" value="{{ ue.dataValue4 }}"></td>
+                            <td><button type="submit" class="btn btn-danger btn-sm" name="delete_ueid" value="{{ ue.id }}">Delete</button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <input type="hidden" name="meid" value="{{ me.id }}">
+                <button type="submit" class="btn btn-primary" name="update">Apply Changes to UEIDs</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Form to create a new UEID -->
+    <div class="card">
+        <div class="card-header">Create New UEID</div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('create_ueid') }}" class="row g-3">
+                <input type="hidden" name="meid" value="{{ me.id }}">
+                <div class="col-md-6">
+                    <label for="name" class="form-label">Name:</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="dataValue1" class="form-label">Data Value 1:</label>
+                    <input type="text" class="form-control" id="dataValue1" name="dataValue1" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="dataValue2" class="form-label">Data Value 2:</label>
+                    <input type="text" class="form-control" id="dataValue2" name="dataValue2" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="dataValue3" class="form-label">Data Value 3:</label>
+                    <input type="text" class="form-control" id="dataValue3" name="dataValue3" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="dataValue4" class="form-label">Data Value 4:</label>
+                    <input type="text" class="form-control" id="dataValue4" name="dataValue4" required>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-success">Create New UEID</button>
+                </div>
+            </form>
+        </div>
+    </div>    
+</div>
 {% endblock %}
