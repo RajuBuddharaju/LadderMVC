@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
+import json
 from datetime import datetime
 import sqlite3
 import random
@@ -225,6 +226,31 @@ def create_meid():
         flash(f'An error occurred: {e}', 'error')
 
     return redirect(url_for('dashboard'))
+
+@app.route('/get_active_ueid/<int:meid>')
+def get_active_ueid(meid):
+    # Query for the MEID entry
+    me = MEID.query.get(meid)
+    if me is None:
+        return jsonify({'error': 'MEID not found'}), 404
+
+    # Check if an active UEID exists
+    active_ue = UEID.query.get(me.activeUEID)
+    if active_ue is None:
+        return jsonify({'activeUEID': None})
+
+    # Return the data of the active UEID
+    active_ue_data = {
+        'id': active_ue.id,
+        'name': active_ue.name,
+        'dataValue1': active_ue.dataValue1,
+        'dataValue2': active_ue.dataValue2,
+        'dataValue3': active_ue.dataValue3,
+        'dataValue4': active_ue.dataValue4
+    }
+
+    return jsonify({'activeUEID': active_ue_data})
+
  
 @app.route('/about')
 def about():
@@ -244,4 +270,4 @@ def form():
    return render_template("form.html", title=title, email=email, question=question)
 
 if __name__ == "__main__":
-    app.run(debug=True, port=6922)
+    app.run(host='0.0.0.0', debug=True, port=6922)
