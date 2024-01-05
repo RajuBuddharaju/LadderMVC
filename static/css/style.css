@@ -1,8 +1,114 @@
-h1{
-    color:black;
+/* Base styles for light mode */
+h1 {
     font-size: 48px;
 }
 
-body{
-    background: white;
+body {
+    background-color: white;
+    color: black;
+}
+
+.navbar.bg-body-tertiary {
+    background-color: #ffffff;
+}
+
+.card {
+    background-color: #ffffff;
+    color: black;
+}
+
+.toggle-mode-btn {
+    border-radius: 20px;
+    border: 2px solid #007bff;
+    background-color: transparent;
+    color: #007bff;
+    transition: all 0.3s ease;
+}
+
+.toggle-mode-btn:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Dark mode specific styles */
+.dark-mode {
+    background-color: #121212;
+    color: white;
+}
+
+.dark-mode .navbar,
+.dark-mode .navbar .navbar-collapse,
+.dark-mode .navbar .navbar-toggler-icon {
+    background-color: #343a40 !important;
+    color: white !important;
+}
+
+.dark-mode .navbar .navbar-brand,
+.dark-mode .navbar .nav-link {
+    color: white !important;
+}
+
+.dark-mode .card,
+.dark-mode .card-header,
+.dark-mode .card-body .form-label,
+.dark-mode .btn {
+    background-color: #2c3034;
+    color: white;
+}
+
+.dark-mode .table,
+.dark-mode .table th,
+.dark-mode .table td {
+    background-color: #1E1E1E;
+    color: white;
+    border-color: #4E4E4E;
+}
+
+.dark-mode .form-control {
+    background-color: #333333;
+    color: white;
+    border-color: #4E4E4E;
+}
+
+.dark-mode .btn-primary,
+.dark-mode .btn-success,
+.dark-mode .btn-danger {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white; /* Ensure text color is white */
+}
+
+.dark-mode .table-success {
+    background-color: #3D3D3D;
+}
+
+.dark-mode .table-hover tbody tr:hover {
+    background-color: #292929;
+}
+
+.dark-mode .nav-link {
+    color: #9DAFB6;
+}
+
+.dark-mode .nav-link:hover {
+    color: white;
+}
+
+.dark-mode .toggle-mode-btn {
+    border-color: #ffa500;
+    color: #ffa500;
+}
+
+.dark-mode .toggle-mode-btn:hover {
+    background-color: #ffa500;
+    color: white;
+}
+
+/* Additional container styles for dark mode */
+.dark-mode .container {
+    background-color: #121212; /* Darker background for contrast */
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 0.5rem 1rem rgba(255, 255, 255, 0.05); /* subtle light shadow for 'lifted card' effect */
 }
