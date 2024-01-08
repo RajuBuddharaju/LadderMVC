@@ -5,7 +5,7 @@
 const char* ssid = "AoA";     // Replace with your WiFi SSID
 const char* password = "An@s20032003"; // Replace with your WiFi password
 const int hardcodedMEID = 69420; // Replace with your hardcoded MEID
-const char* serverName = "http://192.168.0.101:6922/get_active_ueid/"; // Replace with your Flask server URL
+const char* serverName = "https://ladder.xsoul.org/get_active_ueid/"; // Replace with your Flask server URL
 
 
 void setup() {
