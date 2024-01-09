@@ -16,6 +16,7 @@ class MEID(db.Model):
    id = db.Column(db.Integer, primary_key=True)
    password = db.Column(db.String(200))
    activeUEID = db.Column(db.Integer)
+   name = db.Column(db.String(200))
    
    # Creae a fucntion to return a string when we add something
    def __repr__(self):
@@ -38,24 +39,10 @@ class UEID(db.Model):
 
 
 
-@app.route('/', methods=['POST', 'GET'])
-def index():
-    title = "The Ladder"
-    if request.method == "POST":
-        user_name = request.form['name']
-        user_id = random.randint(100000,999999)
-        new_user = UE(name=user_name, id=user_id, meID=1)
-
-        # Push to Database
-        try:
-           db.session.add(new_user)
-           db.session.commit()
-           return redirect('/')
-        except Exception as e:
-           return "There was an error adding your user: " + str(e)
-    else:
-        users = UE.query.order_by(UE.date_created)
-        return render_template("index.html", title=title, users=users)
+# Redirect root to the login page
+@app.route('/')
+def root():
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
