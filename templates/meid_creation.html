@@ -44,8 +44,9 @@
 <body>
     <h1>Create New MEID</h1>
     <form action="{{ url_for('create_meid') }}" method="post">
-        <input type="text" name="meid_name" placeholder="MEID Name" required><br>
+        <input type="text" name="meid" placeholder="MEID" required><br>
         <input type="password" name="meid_password" placeholder="Password" required><br>
+        <input type="text" name="meid_name" placeholder="Name" required><br>
         <!-- Add additional fields as necessary -->
         <input type="submit" value="Create MEID">
     </form>

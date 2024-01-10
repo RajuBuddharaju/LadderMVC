@@ -190,8 +190,9 @@ def secret():
 
 @app.route('/create_meid', methods=['POST'])
 def create_meid():
-    meid_input = request.form.get('meid_name')
+    meid_input = request.form.get('meid')
     meid_password = request.form.get('meid_password')
+    meid_name = request.form.get('meid_name')
 
     try:
         # Convert MEID input to an integer
@@ -202,7 +203,7 @@ def create_meid():
         return redirect(url_for('secret'))
 
     # Proceed with creating the MEID
-    new_meid = MEID(id=meid_number, password=meid_password)
+    new_meid = MEID(id=meid_number, password=meid_password, name=meid_name)
 
     try:
         db.session.add(new_meid)
