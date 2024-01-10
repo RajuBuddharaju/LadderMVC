@@ -1,17 +1,21 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import sqlite3
 import random
 
 app = Flask(__name__)
 app.secret_key = b'\x12\xfbF\xf3\xc5\xa6\x9e\xc6\xa8\x11\xdf\x9e\x95\xf1\xa1\x8f\xe6K\x89u7\x18\x19\x8f'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dbExample.db'
+
 # Initialize the database
 db = SQLAlchemy(app)
 
-# Create db model
+# Set the session to expire after 30 minutes of inactivity
+app.permanent_session_lifetime = timedelta(minutes=30)
+
+# Create db model for Municipality Employees
 class MEID(db.Model):
    id = db.Column(db.Integer, primary_key=True)
    password = db.Column(db.String(200))
@@ -22,7 +26,7 @@ class MEID(db.Model):
    def __repr__(self):
       return '<Name %r>' % self.id
 
-# Create db model
+# Create db model for Users
 class UEID(db.Model):
    id = db.Column(db.Integer, primary_key=True)
    meID = db.Column(db.Integer)
@@ -37,7 +41,11 @@ class UEID(db.Model):
    def __repr__(self):
       return '<Name %r>' % self.id
 
-
+@app.before_request
+def before_request():
+    if not session.get('meid') and request.endpoint not in ['login', 'static']:
+        flash('Your session has expired. Please log in again.', 'info')
+        return redirect(url_for('login'))
 
 # Redirect root to the login page
 @app.route('/')
@@ -64,7 +72,8 @@ def login():
          print("User does not exist")
          return redirect('/login')
       elif result[1] == user_password:
-         print("pp")
+         session.permanent = True
+         session['meid'] = result[0]
          return redirect(url_for('dashboard', me_id=result[0]))
       else:
          print("Incorrect Password")
@@ -75,12 +84,33 @@ def login():
 @app.route('/dashboard')
 def dashboard():
    title = "Dashboard"
+   me_id = request.args.get('me_id') or session.get('meid')
+   if not me_id:
+       return redirect(url_for('login'))
+   
+   me = MEID.query.filter_by(id=me_id).first()
+   if not me or not me.activeUEID:
+       flash('No active UEID found.', 'error')
+       return redirect(url_for('login'))
+
+   active_ue = UEID.query.get(me.activeUEID)
+   if not active_ue:
+       flash('Active UEID not found.', 'error')
+       return redirect(url_for('login'))
+
+   return render_template("dashboard.html", title=title, active_ue=active_ue, me=me)
+
+@app.route('/clients_overview')
+def clients_overview():
+   title = "Clients Overview"
    me_id = request.args.get('me_id')  # Assuming the MEID is passed as a query parameter
    me = MEID.query.filter_by(id=me_id).first()
    if not me:
       return redirect('/login')
+   
    ue_list = UEID.query.filter_by(meID=me_id).all()
-   return render_template("dashboard.html", title=title, me=me, ue_list=ue_list)
+
+   return render_template("clients_overview.html", title=title, me=me, ue_list=ue_list)
 
 @app.route('/update_ueids', methods=['POST'])
 def update_ueids():
@@ -139,7 +169,7 @@ def update_ueids():
         # flash(f'An error occurred: {e}', 'error')
 
     # Redirect back to the dashboard after processing updates
-    return redirect(url_for('dashboard', me_id=me_id))
+    return redirect(url_for('client_overview', me_id=me_id))
 
 
 @app.route('/create_ueid', methods=['POST'])
@@ -173,7 +203,7 @@ def create_ueid():
         db.session.rollback()
 
     # Redirect back to the dashboard after processing
-    return redirect(url_for('dashboard', me_id=me_id))
+    return redirect(url_for('client_overview', me_id=me_id))
 
 @app.route('/secret', methods=['GET', 'POST'])
 def secret():
@@ -256,6 +286,13 @@ def form():
    question = request.form.get("query_question")
    title = "Thank You!!!"
    return render_template("form.html", title=title, email=email, question=question)
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    # Remove the MEID from the session if it's there
+    session.pop('meid', None)
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('login'))
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True, port=6922)
