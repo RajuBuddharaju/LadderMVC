@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container dark-mode-feature"> <!-- This div is the outer container with the different background -->
+<div class="container dark-mode-feature">
     <h1 class="my-4">Welcome to your Dashboard, {{ me.name }}</h1>
     
     <div class="card mb-4">
-        <div class="card-header"><h2>Active UEID Details</h2></div>
+        <div class="card-header"><h2>Active Client Details</h2></div>
         <div class="card-body">
            <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                           <th>UEID</th>
+                            <th>UEID</th>
                             <th>Name</th>
                             <th>Data Value 1</th>
                             <th>Data Value 2</th>
@@ -20,17 +20,69 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Name: {{ active_ue.name }}</td>
-                            <td>UEID: {{ active_ue.id }}</td>
-                            <td>Data Value 1: {{ active_ue.dataValue1 }}</td>
-                            <td>Data Value 2: {{ active_ue.dataValue2 }}</td>
-                            <td>Data Value 3: {{ active_ue.dataValue3 }}</td>
-                            <td>Data Value 4: {{ active_ue.dataValue4 }}</td>
+                            <td>{{ active_ue.id }}</td>
+                            <td>{{ active_ue.name }}</td>
+                            <td>
+                                {{ active_ue.dataValue1 }}
+                                <button type="button" onclick="editGoal( '{{ active_ue.dataValue1 }}' ,'{{ active_ue.detail1 }}','{{ active_ue.progress1 }}')">Edit</button>
+                            </td>
+                            <td>
+                                {{ active_ue.dataValue2 }}
+                                <button type="button" onclick="editGoal('{{ active_ue.dataValue2 }}' ,'{{ active_ue.detail2 }}','{{ active_ue.progress2 }}')">Edit</button>
+                            </td>
+                            <td>
+                                {{ active_ue.dataValue3 }}
+                                <button type="button" onclick="editGoal('{{ active_ue.dataValue3 }}' ,'{{ active_ue.detail3 }}','{{ active_ue.progress3 }}')">Edit</button>
+                            </td>
+                            <td>
+                                {{ active_ue.dataValue4 }}
+                                <button type="button" onclick="editGoal('{{ active_ue.dataValue4 }}' ,'{{ active_ue.detail4 }}','{{ active_ue.progress4 }}')">Edit</button>
+                            </td>
                         </tr>
                     </tbody>
             </table>
         </div>
     </div>   
+    <!-- Edit Goal Section -->
+<div id="editGoalSection" style="display: none; border: 1px solid #ccc; padding: 15px; border-radius: 5px;">
+    <h2>Edit Goal</h2>
+    <form action="/edit_goal" method="post" class="row g-3">
+        <input type="hidden" id="editGoalId" name="goal_id">
+        <!-- Left Column: Goal and Progress Section -->
+        <div class="col-md-6">
+            <label for="goalName" class="form-label">Goal Name:</label>
+            <input type="text" class="form-control" id="goalName" name="goal_name">
+            <label for="goalProgress" class="form-label">Goal Progress:</label>
+            <input type="text" class="form-control" id="goalProgress" name="goal_progress">
+        </div>
+        <!-- Right Column: Goal Details Section -->
+        <div class="col-md-6">
+            <label for="goalDetail" class="form-label">Goal Details:</label>
+            <textarea class="form-control" id="goalDetail" name="goal_detail" style="height: calc(100% - 27px);"></textarea>
+        </div>
+        <!-- Save Changes Button -->
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+    </form>
 </div>
 </div>
+
+<script>
+// Function to display the edit form with existing goal details
+function editGoal(goalName, goalDetail, goalProgress) {
+    // Populate form fields with existing data
+    document.getElementById('goalName').value = goalName;
+    document.getElementById('goalDetail').value = goalDetail;
+    document.getElementById('goalProgress').value = goalProgress;
+    
+    // Display the edit form
+    var editSection = document.getElementById('editGoalSection');
+    editSection.style.display = 'block';
+
+    // Scroll to the edit form
+    editSection.scrollIntoView();
+}
+</script>
+
 {% endblock %}

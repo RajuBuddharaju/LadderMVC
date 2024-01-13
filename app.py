@@ -30,12 +30,20 @@ class MEID(db.Model):
 class UEID(db.Model):
    id = db.Column(db.Integer, primary_key=True)
    meID = db.Column(db.Integer)
-   dataValue1 = db.Column(db.String(64))
-   dataValue2 = db.Column(db.String(64))
-   dataValue3 = db.Column(db.String(64))
-   dataValue4 = db.Column(db.String(64))
+   dataValue1 = db.Column(db.String(64)) # Goal 1
+   dataValue2 = db.Column(db.String(64)) # Goal 2
+   dataValue3 = db.Column(db.String(64)) # Goal 3
+   dataValue4 = db.Column(db.String(64)) # Subgoal
    date_created = db.Column(db.DateTime, default=datetime.utcnow)
    name = db.Column(db.String(200))
+   detail1 = db.Column(db.Text)  # Additional detail for dataValue1
+   detail2 = db.Column(db.Text)  # Additional detail for dataValue2
+   detail3 = db.Column(db.Text)  # Additional detail for dataValue3
+   detail4 = db.Column(db.Text)  # Additional detail for dataValue4
+   progress1 = db.Column(db.Integer)  # Progress status for dataValue1
+   progress2 = db.Column(db.Integer)  # Progress status for dataValue2
+   progress3 = db.Column(db.Integer)  # Progress status for dataValue3
+   progress4 = db.Column(db.Integer)  # Progress status for dataValue4
    
    # Creae a fucntion to return a string when we add something
    def __repr__(self):
@@ -83,6 +91,7 @@ def login():
    
 @app.route('/dashboard')
 def dashboard():
+   print(request.endpoint)
    title = "Dashboard"
    me_id = request.args.get('me_id') or session.get('meid')
    if not me_id:
@@ -99,6 +108,23 @@ def dashboard():
        return redirect(url_for('login'))
 
    return render_template("dashboard.html", title=title, active_ue=active_ue, me=me)
+
+@app.route('/edit_goal', methods=['GET', 'POST'])
+def edit_goal(ueid_id):
+    ueid = UEID.query.get_or_404(ueid_id)
+    
+    if request.method == 'POST':
+        # Retrieve form data
+        ueid.dataValue1 = request.form['dataValue1']
+        ueid.detail1 = request.form['detail1']
+        ueid.progress1 = request.form['progress1']
+        # ... similar for other data values ...
+
+        db.session.commit()
+        flash('Goal updated successfully!')
+        return redirect(url_for('dashboard'))
+
+    return render_template('dashboard.html', ueid=ueid)
 
 @app.route('/clients_overview')
 def clients_overview():
@@ -169,7 +195,7 @@ def update_ueids():
         # flash(f'An error occurred: {e}', 'error')
 
     # Redirect back to the dashboard after processing updates
-    return redirect(url_for('client_overview', me_id=me_id))
+    return redirect(url_for('clients_overview', me_id=me_id))
 
 
 @app.route('/create_ueid', methods=['POST'])
@@ -203,7 +229,7 @@ def create_ueid():
         db.session.rollback()
 
     # Redirect back to the dashboard after processing
-    return redirect(url_for('client_overview', me_id=me_id))
+    return redirect(url_for('clients_overview', me_id=me_id))
 
 @app.route('/secret', methods=['GET', 'POST'])
 def secret():
@@ -269,16 +295,10 @@ def get_active_ueid(meid):
 
     return jsonify({'activeUEID': active_ue_data})
 
- 
-@app.route('/about')
-def about():
-   title = "About The Ladder"
-   return render_template("about.html", title=title)
-
-@app.route('/contact')
-def contact():
-   title = "Contact Us"
-   return render_template("contact.html", title=title)
+@app.route('/more_info')
+def more_info():
+   title = "More Info"
+   return render_template("more_info.html", title=title)
 
 @app.route('/form', methods=["POST"])
 def form():
