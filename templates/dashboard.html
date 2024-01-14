@@ -23,20 +23,20 @@
                             <td>{{ active_ue.id }}</td>
                             <td>{{ active_ue.name }}</td>
                             <td>
-                                {{ active_ue.dataValue1 }}
-                                <button type="button" onclick="editGoal( '{{ active_ue.dataValue1 }}' ,'{{ active_ue.detail1 }}','{{ active_ue.progress1 }}')">Edit</button>
+                                {{ active_ue.goal1.data_value }}
+                                <button type="button" onclick="editGoal('1', '{{ active_ue.goal1.data_value }}' ,'{{ active_ue.goal1.description }}','{{ active_ue.goal1.progress }}')">Edit</button>
                             </td>
                             <td>
-                                {{ active_ue.dataValue2 }}
-                                <button type="button" onclick="editGoal('{{ active_ue.dataValue2 }}' ,'{{ active_ue.detail2 }}','{{ active_ue.progress2 }}')">Edit</button>
+                                {{ active_ue.goal2.data_value }}
+                                <button type="button" onclick="editGoal('2', '{{ active_ue.goal2.data_value }}' ,'{{ active_ue.goal2.description }}','{{ active_ue.goal2.progress }}')">Edit</button>
                             </td>
                             <td>
-                                {{ active_ue.dataValue3 }}
-                                <button type="button" onclick="editGoal('{{ active_ue.dataValue3 }}' ,'{{ active_ue.detail3 }}','{{ active_ue.progress3 }}')">Edit</button>
+                                {{ active_ue.goal3.data_value }}
+                                <button type="button" onclick="editGoal('3', '{{ active_ue.goal3.data_value }}' ,'{{ active_ue.goal3.description }}','{{ active_ue.goal3.progress }}')">Edit</button>
                             </td>
                             <td>
-                                {{ active_ue.dataValue4 }}
-                                <button type="button" onclick="editGoal('{{ active_ue.dataValue4 }}' ,'{{ active_ue.detail4 }}','{{ active_ue.progress4 }}')">Edit</button>
+                                {{ active_ue.goal4.data_value }}
+                                <button type="button" onclick="editGoal('4', '{{ active_ue.goal4.data_value }}' ,'{{ active_ue.goal4.description }}','{{ active_ue.goal4.progress }}')">Edit</button>
                             </td>
                         </tr>
                     </tbody>
@@ -46,8 +46,9 @@
     <!-- Edit Goal Section -->
 <div id="editGoalSection" style="display: none; border: 1px solid #ccc; padding: 15px; border-radius: 5px;">
     <h2>Edit Goal</h2>
-    <form action="/edit_goal" method="post" class="row g-3">
-        <input type="hidden" id="editGoalId" name="goal_id">
+    <form action="{{ url_for('edit_goal') }}" method="post" class="row g-3">
+        <input type="hidden" name="ueid" value="{{ active_ue.id }}">
+        <input type="hidden" id="editGoalId" name="goalNumber">
         <!-- Left Column: Goal and Progress Section -->
         <div class="col-md-6">
             <label for="goalName" class="form-label">Goal Name:</label>
@@ -70,11 +71,13 @@
 
 <script>
 // Function to display the edit form with existing goal details
-function editGoal(goalName, goalDetail, goalProgress) {
+function editGoal(goalNumber, goalName, goalDetail, goalProgress) {
     // Populate form fields with existing data
     document.getElementById('goalName').value = goalName;
     document.getElementById('goalDetail').value = goalDetail;
     document.getElementById('goalProgress').value = goalProgress;
+
+    document.getElementById('editGoalId').value = goalNumber;
     
     // Display the edit form
     var editSection = document.getElementById('editGoalSection');

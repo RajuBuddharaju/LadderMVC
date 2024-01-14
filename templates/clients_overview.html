@@ -27,10 +27,10 @@
                             <td><input type="radio" class="form-check-input" name="activeUEID" value="{{ ue.id }}" {% if ue.id == me.activeUEID %} checked {% endif %}></td>
                             <td>{{ ue.id }}</td>
                             <td>{{ ue.name }}</td>
-                            <td><input type="text" class="form-control" name="dataValue1_{{ ue.id }}" value="{{ ue.dataValue1 }}"></td>
-                            <td><input type="text" class="form-control" name="dataValue2_{{ ue.id }}" value="{{ ue.dataValue2 }}"></td>
-                            <td><input type="text" class="form-control" name="dataValue3_{{ ue.id }}" value="{{ ue.dataValue3 }}"></td>
-                            <td><input type="text" class="form-control" name="dataValue4_{{ ue.id }}" value="{{ ue.dataValue4 }}"></td>
+                            <td><input type="text" class="form-control" name="dataValue1_{{ ue.id }}" value="{{ ue.goal1.data_value }}"></td>
+                            <td><input type="text" class="form-control" name="dataValue2_{{ ue.id }}" value="{{ ue.goal2.data_value }}"></td>
+                            <td><input type="text" class="form-control" name="dataValue3_{{ ue.id }}" value="{{ ue.goal3.data_value }}"></td>
+                            <td><input type="text" class="form-control" name="dataValue4_{{ ue.id }}" value="{{ ue.goal4.data_value }}"></td>
                             <td><button type="submit" class="btn btn-danger btn-sm" name="delete_ueid" value="{{ ue.id }}">Delete</button></td>
                         </tr>
                         {% endfor %}

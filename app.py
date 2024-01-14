@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 import json
 from datetime import datetime, timedelta
 import sqlite3
@@ -11,6 +12,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dbExample.db'
 
 # Initialize the database
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 # Set the session to expire after 30 minutes of inactivity
 app.permanent_session_lifetime = timedelta(minutes=30)
@@ -30,24 +32,34 @@ class MEID(db.Model):
 class UEID(db.Model):
    id = db.Column(db.Integer, primary_key=True)
    meID = db.Column(db.Integer)
-   dataValue1 = db.Column(db.String(64)) # Goal 1
-   dataValue2 = db.Column(db.String(64)) # Goal 2
-   dataValue3 = db.Column(db.String(64)) # Goal 3
-   dataValue4 = db.Column(db.String(64)) # Subgoal
    date_created = db.Column(db.DateTime, default=datetime.utcnow)
    name = db.Column(db.String(200))
-   detail1 = db.Column(db.Text)  # Additional detail for dataValue1
-   detail2 = db.Column(db.Text)  # Additional detail for dataValue2
-   detail3 = db.Column(db.Text)  # Additional detail for dataValue3
-   detail4 = db.Column(db.Text)  # Additional detail for dataValue4
-   progress1 = db.Column(db.Integer)  # Progress status for dataValue1
-   progress2 = db.Column(db.Integer)  # Progress status for dataValue2
-   progress3 = db.Column(db.Integer)  # Progress status for dataValue3
-   progress4 = db.Column(db.Integer)  # Progress status for dataValue4
+
+   # Foreign keys for goals
+   goal1_id = db.Column(db.Integer, db.ForeignKey('goal.id'))
+   goal2_id = db.Column(db.Integer, db.ForeignKey('goal.id'))
+   goal3_id = db.Column(db.Integer, db.ForeignKey('goal.id'))
+   goal4_id = db.Column(db.Integer, db.ForeignKey('goal.id'))
+
+    # Relationships to Goal model
+   goal1 = db.relationship('Goal', foreign_keys=[goal1_id])
+   goal2 = db.relationship('Goal', foreign_keys=[goal2_id])
+   goal3 = db.relationship('Goal', foreign_keys=[goal3_id])
+   goal4 = db.relationship('Goal', foreign_keys=[goal4_id])
    
    # Creae a fucntion to return a string when we add something
    def __repr__(self):
       return '<Name %r>' % self.id
+
+class Goal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    data_value = db.Column(db.String(64))  # This might represent a goal title or category
+    progress = db.Column(db.Integer)  # Progress as an integer (0 to 2)
+    description = db.Column(db.String(200))  # Description of the goal
+
+    def __repr__(self):
+        return '<Goal %r>' % self.id
+
 
 @app.before_request
 def before_request():
@@ -110,18 +122,41 @@ def dashboard():
    return render_template("dashboard.html", title=title, active_ue=active_ue, me=me)
 
 @app.route('/edit_goal', methods=['GET', 'POST'])
-def edit_goal(ueid_id):
-    ueid = UEID.query.get_or_404(ueid_id)
+def edit_goal():
+    ueid = request.form.get('ueid');
+    if not ueid:
+        print('No UEID provided.')
+        return redirect(url_for('dashboard'))
+    
+    ue = UEID.query.get(ueid)
     
     if request.method == 'POST':
-        # Retrieve form data
-        ueid.dataValue1 = request.form['dataValue1']
-        ueid.detail1 = request.form['detail1']
-        ueid.progress1 = request.form['progress1']
-        # ... similar for other data values ...
+        goalNumber = request.form.get('goalNumber')
+        if not goalNumber:
+            print('No goal number provided.')
+            return redirect(url_for('dashboard'))
+        
+        # Retrieve form data]
+        if goalNumber == '1':
+                print('Updating goal 1')
+                ue.goal1.data_value = request.form.get('goal_name')
+                ue.goal1.progress = request.form.get('goal_progress')
+                ue.goal1.description = request.form.get('goal_detail')
+        elif goalNumber == '2':
+                ue.goal2.data_value = request.form.get('goal_name')
+                ue.goal2.progress = request.form.get('goal_progress')
+                ue.goal2.description = request.form.get('goal_detail')
+        elif goalNumber == '3':
+                ue.goal3.data_value = request.form.get('goal_name')
+                ue.goal3.progress = request.form.get('goal_progress')
+                ue.goal3.description = request.form.get('goal_detail')
+        elif goalNumber == '4':
+                ue.goal4.data_value = request.form.get('goal_name')
+                ue.goal4.progress = request.form.get('goal_progress')
+                ue.goal4.description = request.form.get('goal_detail')
 
         db.session.commit()
-        flash('Goal updated successfully!')
+        print('Goal updated successfully!')
         return redirect(url_for('dashboard'))
 
     return render_template('dashboard.html', ueid=ueid)
@@ -171,22 +206,21 @@ def update_ueids():
                         me.activeUEID = None  # Reset the activeUEID
 
                     db.session.delete(ue)
+                    db.session.delete(ue.goal1)
+                    db.session.delete(ue.goal2)
+                    db.session.delete(ue.goal3)
+                    db.session.delete(ue.goal4)
                     continue  # Skip the rest of the loop for this UEID
 
-            # Otherwise, update the UEID
-            data_value_1 = request.form.get(f'dataValue1_{ue_id}')
-            data_value_2 = request.form.get(f'dataValue2_{ue_id}')
-            data_value_3 = request.form.get(f'dataValue3_{ue_id}')
-            data_value_4 = request.form.get(f'dataValue4_{ue_id}')
 
             # Retrieve the UE object from the database
             ue = UEID.query.get(ue_id)
             if ue:
                 # Update the UE object with new data values
-                ue.dataValue1 = data_value_1
-                ue.dataValue2 = data_value_2
-                ue.dataValue3 = data_value_3
-                ue.dataValue4 = data_value_4
+                ue.goal1.data_value = request.form.get(f'dataValue1_{ue_id}')
+                ue.goal2.data_value = request.form.get(f'dataValue2_{ue_id}')
+                ue.goal3.data_value = request.form.get(f'dataValue3_{ue_id}')
+                ue.goal4.data_value = request.form.get(f'dataValue4_{ue_id}')
 
         db.session.commit()
     except Exception as e:
@@ -219,11 +253,14 @@ def create_ueid():
     data_value_4 = request.form.get('dataValue4')
 
     # Create a new UE object and set its attributes
-    new_ue = UEID(meID=me_id, name=name, dataValue1=data_value_1, dataValue2=data_value_2, dataValue3=data_value_3, dataValue4=data_value_4)
-
+    new_ueid = UEID(meID=me_id, name=name)
+    new_ueid.goal1 = Goal(data_value=data_value_1, progress=0, description='')
+    new_ueid.goal2 = Goal(data_value=data_value_2, progress=0, description='')
+    new_ueid.goal3 = Goal(data_value=data_value_3, progress=0, description='')
+    new_ueid.goal4 = Goal(data_value=data_value_4, progress=0, description='')
     try:
         # Add the new UE object to the session and commit it to the database
-        db.session.add(new_ue)
+        db.session.add(new_ueid)
         db.session.commit()
     except Exception as e:
         db.session.rollback()
