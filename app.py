@@ -73,10 +73,12 @@ class Reward(db.Model):
     def __repr__(self):
         return '<Reward %r>' % self.name
 
-
 @app.before_request
 def before_request():
-    if not session.get('meid') and request.endpoint not in ['login', 'static']:
+    # Exclude certain endpoints from session check
+    excluded_endpoints = ['login', 'static', 'get_active_ueid']
+
+    if not session.get('meid') and request.endpoint not in excluded_endpoints:
         flash('Your session has expired. Please log in again.', 'info')
         return redirect(url_for('login'))
 

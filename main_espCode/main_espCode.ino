@@ -20,7 +20,7 @@ void setup() {
 
 void loop() {
     getActiveUEID();
-    delay(30000); // Wait for 30 seconds before fetching again
+    delay(10000); // Wait for 30 seconds before fetching again
 }
 
 void getActiveUEID() {
@@ -57,10 +57,10 @@ void getActiveUEID() {
                     int progress2 = activeUEID["progress2"].as<int>();
                     int progress3 = activeUEID["progress3"].as<int>();
                     int progress4 = activeUEID["progress4"].as<int>();
-                    Serial.print("Goal1: " + goal1 + " at progress " + progress1);
-                    Serial.print("Goal2: " + goal2 + " at progress " + progress2);
-                    Serial.print("Goal3: " + goal3 + " at progress " + progress3);
-                    Serial.print("Sub Goal: " + goal4 + " at progress " + progress4);
+                    Serial.println("Goal1: " + goal1 + " at progress " + progress1);
+                    Serial.println("Goal2: " + goal2 + " at progress " + progress2);
+                    Serial.println("Goal3: " + goal3 + " at progress " + progress3);
+                    Serial.println("Sub Goal: " + goal4 + " at progress " + progress4);
                 }
             }
         }
