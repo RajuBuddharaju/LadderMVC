@@ -54,7 +54,7 @@ class UEID(db.Model):
 class Goal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data_value = db.Column(db.String(64))  # This might represent a goal title or category
-    progress = db.Column(db.Integer)  # Progress as an integer (0 to 2)
+    progress = db.Column(db.Integer)  # Progress as an integer (1 to 3)
     description = db.Column(db.String(200))  # Description of the goal
 
     def __repr__(self):
@@ -254,10 +254,10 @@ def create_ueid():
 
     # Create a new UE object and set its attributes
     new_ueid = UEID(meID=me_id, name=name)
-    new_ueid.goal1 = Goal(data_value=data_value_1, progress=0, description='')
-    new_ueid.goal2 = Goal(data_value=data_value_2, progress=0, description='')
-    new_ueid.goal3 = Goal(data_value=data_value_3, progress=0, description='')
-    new_ueid.goal4 = Goal(data_value=data_value_4, progress=0, description='')
+    new_ueid.goal1 = Goal(data_value=data_value_1, progress=1, description='')
+    new_ueid.goal2 = Goal(data_value=data_value_2, progress=1, description='')
+    new_ueid.goal3 = Goal(data_value=data_value_3, progress=1, description='')
+    new_ueid.goal4 = Goal(data_value=data_value_4, progress=1, description='')
     try:
         # Add the new UE object to the session and commit it to the database
         db.session.add(new_ueid)
@@ -324,10 +324,14 @@ def get_active_ueid(meid):
     active_ue_data = {
         'id': active_ue.id,
         'name': active_ue.name,
-        'dataValue1': active_ue.dataValue1,
-        'dataValue2': active_ue.dataValue2,
-        'dataValue3': active_ue.dataValue3,
-        'dataValue4': active_ue.dataValue4
+        'dataValue1': active_ue.goal1.data_value,
+        'dataValue2': active_ue.goal2.data_value,
+        'dataValue3': active_ue.goal3.data_value,
+        'dataValue4': active_ue.goal4.data_value,
+        'progress1': active_ue.goal1.progress,
+        'progress2': active_ue.goal2.progress,
+        'progress3': active_ue.goal3.progress,
+        'progress4': active_ue.goal4.progress
     }
 
     return jsonify({'activeUEID': active_ue_data})
