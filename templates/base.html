@@ -25,6 +25,9 @@
                     <a class="nav-link {{ 'active' if request.endpoint == 'clients_overview' else '' }}" href="{{ url_for('clients_overview', me_id=session.get('meid', 'default_value')) }}">Clients Overview</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'rewards' else '' }}" href="{{ url_for('rewards') }}">Rewards</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link {{ 'active' if request.endpoint == 'more_info' else '' }}" href="{{ url_for('more_info') }}">More Info</a>
                 </li>
             </ul>

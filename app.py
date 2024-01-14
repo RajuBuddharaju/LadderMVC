@@ -57,8 +57,21 @@ class Goal(db.Model):
     progress = db.Column(db.Integer)  # Progress as an integer (1 to 3)
     description = db.Column(db.String(200))  # Description of the goal
 
+    # Foreign key for reward 
+    reward_id = db.Column(db.Integer, db.ForeignKey('reward.id'))
+    reward = db.relationship('Reward', foreign_keys=[reward_id])
+
+
     def __repr__(self):
         return '<Goal %r>' % self.id
+    
+class Reward(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(200))
+
+    def __repr__(self):
+        return '<Reward %r>' % self.name
 
 
 @app.before_request
@@ -118,8 +131,10 @@ def dashboard():
    if not active_ue:
        flash('Active UEID not found.', 'error')
        return redirect(url_for('login'))
+   
+   rewards = Reward.query.all()
 
-   return render_template("dashboard.html", title=title, active_ue=active_ue, me=me)
+   return render_template("dashboard.html", title=title, active_ue=active_ue, me=me, rewards=rewards)
 
 @app.route('/edit_goal', methods=['GET', 'POST'])
 def edit_goal():
@@ -140,20 +155,24 @@ def edit_goal():
         if goalNumber == '1':
                 print('Updating goal 1')
                 ue.goal1.data_value = request.form.get('goal_name')
-                ue.goal1.progress = request.form.get('goal_progress')
+                ue.goal1.progress = int(request.form.get('goal_progress'))
                 ue.goal1.description = request.form.get('goal_detail')
+                ue.goal1.reward_id = request.form.get('goal_reward')
         elif goalNumber == '2':
                 ue.goal2.data_value = request.form.get('goal_name')
-                ue.goal2.progress = request.form.get('goal_progress')
+                ue.goal2.progress = int(request.form.get('goal_progress'))
                 ue.goal2.description = request.form.get('goal_detail')
+                ue.goal2.reward_id = request.form.get('goal_reward')
         elif goalNumber == '3':
                 ue.goal3.data_value = request.form.get('goal_name')
-                ue.goal3.progress = request.form.get('goal_progress')
+                ue.goal3.progress = int(request.form.get('goal_progress'))
                 ue.goal3.description = request.form.get('goal_detail')
+                ue.goal3.reward_id = request.form.get('goal_reward')
         elif goalNumber == '4':
                 ue.goal4.data_value = request.form.get('goal_name')
-                ue.goal4.progress = request.form.get('goal_progress')
+                ue.goal4.progress = int(request.form.get('goal_progress'))
                 ue.goal4.description = request.form.get('goal_detail')
+                ue.goal4.reward_id = request.form.get('goal_reward')
 
         db.session.commit()
         print('Goal updated successfully!')
@@ -267,6 +286,37 @@ def create_ueid():
 
     # Redirect back to the dashboard after processing
     return redirect(url_for('clients_overview', me_id=me_id))
+
+@app.route('/rewards', methods=['GET', 'POST'])
+def rewards():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        description = request.form.get('description')
+        new_reward = Reward(name=name, description=description)
+        db.session.add(new_reward)
+        db.session.commit()
+        return redirect(url_for('rewards'))
+
+    all_rewards = Reward.query.all()
+    return render_template('rewards.html', rewards=all_rewards)
+
+@app.route('/delete_reward/<int:reward_id>', methods=['POST'])
+def delete_reward(reward_id):
+    # Query for the specific reward
+    reward = Reward.query.get_or_404(reward_id)
+
+    # Delete the reward from the database
+    try:
+        # TODO: Check if the reward is being used by any UEIDs and make them null.
+        db.session.delete(reward)
+        db.session.commit()
+        print('Reward deleted successfully.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        print(f'Error deleting reward: {e}', 'error')
+
+    # Redirect to the rewards page
+    return redirect(url_for('rewards'))
 
 @app.route('/secret', methods=['GET', 'POST'])
 def secret():

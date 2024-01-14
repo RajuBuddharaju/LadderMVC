@@ -24,3 +24,44 @@
     background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='%235b3000' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
+.form-label {
+    margin-bottom: 5px; /* Space between label and input */
+    display: block; /* Ensure label takes the full width */
+}
+
+.form-control, select {
+    margin-bottom: 15px; /* Space after input/select before next item */
+}
+
+select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+}
+
+.row.g-3 {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.row.g-3 > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+textarea#goalDetail {
+    height: 100% - 20px; /* Adjusted height to match other inputs */
+}
+
+#editGoalSection {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+

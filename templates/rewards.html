@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container dark-mode-feature">
+    <h1 class="my-4">Rewards Management</h1>
+    <!-- Display existing Rewards -->
+    <div class="card">
+        <div class="card-header">Available Rewards</div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Reward Name</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reward in rewards %}
+                    <tr>
+                        <td>{{ reward.name }}</td>
+                        <td>{{ reward.description }}</td>
+                        <td>
+                            <form method="post" action="{{ url_for('delete_reward', reward_id=reward.id) }}">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</br>
+    <!-- Form to create a new Reward -->
+    <div class="card mb-4">
+        <div class="card-header">Create New Reward</div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('rewards') }}" class="row g-3">
+                <div class="col-md-6">
+                    <label for="name" class="form-label">Reward Name:</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="description" class="form-label">Description:</label>
+                    <textarea class="form-control" id="description" name="description" required></textarea>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-success">Add Reward</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    
+</div>
+</div>
+{% endblock %}

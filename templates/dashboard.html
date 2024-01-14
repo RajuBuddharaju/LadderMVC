@@ -24,19 +24,19 @@
                             <td>{{ active_ue.name }}</td>
                             <td>
                                 {{ active_ue.goal1.data_value }}
-                                <button type="button" onclick="editGoal('1', '{{ active_ue.goal1.data_value }}' ,'{{ active_ue.goal1.description }}','{{ active_ue.goal1.progress }}')">Edit</button>
+                                <button type="button" onclick="editGoal('1', '{{ active_ue.goal1.data_value }}' ,'{{ active_ue.goal1.description }}', '{{ active_ue.goal1.progress }}', '{{ active_ue.goal1.reward.name }}')">Edit</button>
                             </td>
                             <td>
                                 {{ active_ue.goal2.data_value }}
-                                <button type="button" onclick="editGoal('2', '{{ active_ue.goal2.data_value }}' ,'{{ active_ue.goal2.description }}','{{ active_ue.goal2.progress }}')">Edit</button>
+                                <button type="button" onclick="editGoal('2', '{{ active_ue.goal2.data_value }}' ,'{{ active_ue.goal2.description }}', '{{ active_ue.goal2.progress }}', '{{ active_ue.goal2.reward.name }}')">Edit</button>
                             </td>
                             <td>
                                 {{ active_ue.goal3.data_value }}
-                                <button type="button" onclick="editGoal('3', '{{ active_ue.goal3.data_value }}' ,'{{ active_ue.goal3.description }}','{{ active_ue.goal3.progress }}')">Edit</button>
+                                <button type="button" onclick="editGoal('3', '{{ active_ue.goal3.data_value }}' ,'{{ active_ue.goal3.description }}', '{{ active_ue.goal3.progress }}', '{{ active_ue.goal3.reward.name }}')">Edit</button>
                             </td>
                             <td>
                                 {{ active_ue.goal4.data_value }}
-                                <button type="button" onclick="editGoal('4', '{{ active_ue.goal4.data_value }}' ,'{{ active_ue.goal4.description }}','{{ active_ue.goal4.progress }}')">Edit</button>
+                                <button type="button" onclick="editGoal('4', '{{ active_ue.goal4.data_value }}' ,'{{ active_ue.goal4.description }}', '{{ active_ue.goal4.progress }}', '{{ active_ue.goal4.reward.name }}')">Edit</button>
                             </td>
                         </tr>
                     </tbody>
@@ -45,22 +45,38 @@
     </div>   
     <!-- Edit Goal Section -->
 <div id="editGoalSection" style="display: none; border: 1px solid #ccc; padding: 15px; border-radius: 5px;">
-    <h2>Edit Goal</h2>
+        <h2>Edit Goal</h2>
     <form action="{{ url_for('edit_goal') }}" method="post" class="row g-3">
         <input type="hidden" name="ueid" value="{{ active_ue.id }}">
         <input type="hidden" id="editGoalId" name="goalNumber">
+
         <!-- Left Column: Goal and Progress Section -->
         <div class="col-md-6">
             <label for="goalName" class="form-label">Goal Name:</label>
             <input type="text" class="form-control" id="goalName" name="goal_name">
             <label for="goalProgress" class="form-label">Goal Progress:</label>
-            <input type="text" class="form-control" id="goalProgress" name="goal_progress">
+            <select class="form-control" id="goalProgress" name="goal_progress" onchange="updateProgressColor()">
+                <!-- Progress options here -->
+                <option value="1" style="background-color: red;">Not Started</option>
+                <option value="2" style="background-color: yellow;">In Progress</option>
+                <option value="3" style="background-color: green;">Completed</option>
+            </select>
         </div>
+
         <!-- Right Column: Goal Details Section -->
         <div class="col-md-6">
+            <label for="goalReward" class="form-label">Select Reward:</label>
+            <select id="goalReward" name="goal_reward" class="form-control">
+                <!-- Reward options here -->
+                <option value="">No Reward</option>
+                    {% for reward in rewards %}
+                        <option value="{{ reward.id }}">{{ reward.name }}</option>
+                    {% endfor %}
+            </select>
             <label for="goalDetail" class="form-label">Goal Details:</label>
-            <textarea class="form-control" id="goalDetail" name="goal_detail" style="height: calc(100% - 27px);"></textarea>
+            <textarea class="form-control" id="goalDetail" name="goal_detail"></textarea>
         </div>
+
         <!-- Save Changes Button -->
         <div class="col-12">
             <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -71,11 +87,32 @@
 
 <script>
 // Function to display the edit form with existing goal details
-function editGoal(goalNumber, goalName, goalDetail, goalProgress) {
+function editGoal(goalNumber, goalName, goalDetail, goalProgress, goalReward) {
     // Populate form fields with existing data
     document.getElementById('goalName').value = goalName;
     document.getElementById('goalDetail').value = goalDetail;
-    document.getElementById('goalProgress').value = goalProgress;
+    
+    // Select the correct progress option
+    var progressSelect = document.getElementById('goalProgress');
+    for (var i = 0; i < progressSelect.options.length; i++) {
+        if (progressSelect.options[i].value === goalProgress) {
+            progressSelect.selectedIndex = i;
+            progressSelect.style.backgroundColor = progressSelect.options[i].style.backgroundColor;
+            break;
+        }
+    }
+
+    var rewardSelect = document.getElementById('goalReward');
+    if (!goalReward || goalReward === 'None') {
+        rewardSelect.selectedIndex = 0; // Select the "No Reward" option
+    } else {
+        for (var i = 0; i < rewardSelect.options.length; i++) {
+            if (rewardSelect.options[i].text === goalReward) {
+                rewardSelect.selectedIndex = i;
+                break;
+            }
+        }
+    }
 
     document.getElementById('editGoalId').value = goalNumber;
     
@@ -85,6 +122,14 @@ function editGoal(goalNumber, goalName, goalDetail, goalProgress) {
 
     // Scroll to the edit form
     editSection.scrollIntoView();
+}
+
+function updateProgressColor() {
+    var progressSelect = document.getElementById('goalProgress');
+    var selectedOption = progressSelect.options[progressSelect.selectedIndex];
+
+    // Change the background color of the select element
+    progressSelect.style.backgroundColor = selectedOption.style.backgroundColor;
 }
 </script>
 
