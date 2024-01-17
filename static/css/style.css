@@ -64,4 +64,36 @@ textarea#goalDetail {
     margin-top: 20px;
 }
 
+/* Submit Button Style */
+button[type="submit"] {
+    background-color: #5b3000;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+button[type="submit"]:active {
+    background-color: #eb3633;
+}
+
+body, h1, h2, h3, h4, h5, h6, div, span, input, select, textarea, table, th, td {
+    color: #66462c; /* Sets the color for text in various elements */
+}
+
+/* Apply color to text inside form elements and table data */
+input, select, textarea, table th, table td {
+    color: #66462c; /* Your chosen text color */
+}
+
+/* For options in select dropdowns, additional styling might be needed */
+select option {
+    color: #66462c; /* Ensures text color consistency in dropdown options */
+}
 

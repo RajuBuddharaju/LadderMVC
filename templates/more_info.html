@@ -1,19 +1,29 @@
 {% extends 'base.html' %}
 {% block content %}
-      <div class="container">
-    <h1>Enter your email to ask an question</h1>
-    <br/><br/>
+<div class="container">
+  <h1>About 'The Ladder'</h1>
+  <br/><br/>
+  <div class="project-description">
+    
+    <p>
+      'The Ladder' is an innovative IoT-based solution designed to aid city residents in achieving personal and social goals. It features an interactive ladder system, integrating gamification to encourage progress. Users can set and track major and sub-goals with tangible elements, enhancing motivation and engagement. This project, primarily based in counselor offices, also includes a home-use miniature version, making goal-setting a part of daily life.
+    </p>
+  </div>
+  
+  <br/>
 
-    <form action="/form" method="POST">
+  <h2>Enter your email to ask a question</h2>
+  
+  <form action="/form" method="POST">
     <div class="mb-3">
-        <label for="exampleFormControlInput1" class="form-label">Email address</label>
-        <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com" name="email_id">
-      </div>
-      <div class="mb-3">
-        <label for="exampleFormControlTextarea1" class="form-label">Query/Question</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="query_question"></textarea>
-      </div>
-      <button type="submit" class="btn btn-secondary">Submit</button>
-    </form>
+      <label for="exampleFormControlInput1" class="form-label">Email address</label>
+      <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com" name="email_id">
+    </div>
+    <div class="mb-3">
+      <label for="exampleFormControlTextarea1" class="form-label">Query/Question</label>
+      <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="query_question"></textarea>
+    </div>
+    <button type="submit" class="btn btn-secondary">Submit</button>
+  </form>
 </div>
 {% endblock %}
