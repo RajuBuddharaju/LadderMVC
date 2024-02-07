@@ -2,8 +2,8 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
-const char* ssid = "Polmans";     // Replace with your WiFi SSID
-const char* password = "0402851544"; // Replace with your WiFi password
+const char* ssid = "GalaxyS23";     // Replace with your WiFi SSID //Name of the Hotspot
+const char* password = "uhuhuh1234"; // Replace with your WiFi password //Password of the Hotspot
 const int hardcodedMEID = 1234; // Replace with your hardcoded MEID
 const char* serverName = "https://ladder.xsoul.org/get_active_ueid/"; // Replace with your Flask server URL
 
@@ -61,6 +61,8 @@ void getActiveUEID() {
                     Serial.println("Goal2: " + goal2 + " at progress " + progress2);
                     Serial.println("Goal3: " + goal3 + " at progress " + progress3);
                     Serial.println("Sub Goal: " + goal4 + " at progress " + progress4);
+
+                    // AAAAAAAAAAAAAAAAAdd code for the transfer through Mareijn's stuff.
                 }
             }
         }
